@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Text Summarization</title>
+    <style>
+      
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f2f2f2;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 40px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px #888888;
+      }
+      h1, h2 {
+        text-align: center;
+        margin: 0 0 20px 0;
+      }
+      label {
+        font-weight: bold;
+      }
+      textarea {
+        width: 100%;
+        height: 200px;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        box-shadow: 0px 0px 5px #888888;
+        margin-bottom: 20px;
+        font-size: 16px;
+        resize: none;
+      }
+      button {
+        display: block;
+        margin: 0 auto;
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+      .output {
+        margin-top: 40px;
+      }
+      .word-count {
+        margin-top: 20px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Text Summarization</h1>
+      <form action="/summarize" method="POST">
+        <label for="text">Enter text to summarize:</label>
+        <textarea id="text" name="text" placeholder="Enter text here..."></textarea>
+        <label for="percentage">Select the percentage of summary:</label>
+        <input type="number" id="percentage" name="percentage" min="1" max="99.99" value="30">
+        <button type="submit">Summarize</button>
+      </form>
+      <div class="output">
+        <h2>Summary:</h2>
+        <p id="summary"></p>
+        <div class="word-count">
+          <p>Input word count: <span id="input-word-count"></span></p>
+          <p>Output word count: <span id="output-word-count"></span></p>
+        </div>
+      </div>
+    </div>
+    <script>
+        const form = document.querySelector('form');
+        const summaryElement = document.getElementById('summary');
+        const inputWordCountElement = document.getElementById('input-word-count');
+        const outputWordCountElement = document.getElementById('output-word-count');
+      
+        form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        const text = document.getElementById('text').value;
+        if (text.trim() === '') {
+          alert("Please enter some text to summarize.");
+          return;
+        }
+
+        const formData = new FormData(form);
+        const response = await fetch('/summarize', {
+          method: 'POST',
+          body: formData
+        });
+    
+        const summary = await response.text();
+        const inputWordCount = formData.get('text').split(' ').length;
+        const outputWordCount = summary.split(' ').length;
+    
+        if (outputWordCount === 1) {
+          alert("You can't summarize up to this percentage. Please increase your percentage for summarization.");
+          return;
+        }
+    
+        summaryElement.textContent = summary;
+        inputWordCountElement.textContent = inputWordCount;
+        outputWordCountElement.textContent = outputWordCount;
+      });
+    </script>    
+  </body>
+</html>
